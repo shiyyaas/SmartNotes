@@ -21,7 +21,4 @@ This is a small project — contributions are welcome!
 - Bug reports or suggestions: open an issue
 - Small PRs: formatting, small fixes, or adding a screenshot README → appreciated
 
-## License 📜
-Add a LICENSE file to choose a license. If you want, I can create an MIT license file for you.
-
 Enjoy using SmartNotes! 🎉
