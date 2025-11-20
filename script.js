@@ -1,4 +1,3 @@
-// import OpenAI from "openai";
 
 let notes = [];
 let editingId = null;
@@ -76,17 +75,43 @@ function editNote(id) {
 //Ai feature
 async function aifeature(id) {
     const note = notes.find(n => n.id === id);
-    //Ai configuration
-    const client = new OpenAI({
-        apiKey: process.env.GROQ_API_KEY,
-        baseURL: "https://api.groq.com/openai/v1",
-    });
+    if (!note) {
+        alert('Note not found.');
+        return;
+    }
 
-    const response = await client.responses.create({
-        model: "openai/gpt-oss-20b",
-        input: "Explain the importance of fast language models",
-    });
-    alert(response.output_text);
+    try {
+        // Optional: simple loading state
+        // (You can later improve by disabling the button etc.)
+        const response = await fetch('/api/ai-note', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content: note.content }),
+        });
+
+        if (!response.ok) {
+            throw new Error('AI request failed');
+        }
+
+        const data = await response.json();
+
+        const summary = data.summary || 'No summary.';
+        const tags = Array.isArray(data.tags) ? data.tags.join(', ') : '';
+        const mood = data.mood || 'unknown';
+
+        alert(
+            `Summary:\n${summary}\n\nTags: ${tags}\nMood: ${mood}`
+        );
+
+        // Later you can:
+        // - Save summary/tags/mood into the note object
+        // - Re-render the note card with an "AI Insights" section
+    } catch (err) {
+        console.error(err);
+        alert('Failed to generate AI insights. Please try again.');
+    }
 }
 
 // Cancel edit
