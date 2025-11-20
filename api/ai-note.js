@@ -30,11 +30,11 @@ export default async function handler(req, res) {
           {
             role: 'user',
             content: `Note:\n\n${content}\n\nReturn JSON like:
-{
-  "summary": "...",
-  "tags": ["tag1","tag2"],
-  "mood": "happy"
-}`
+            {
+            "summary": "...",
+            "tags": ["tag1","tag2"],
+            "mood": "happy"
+            }`
           }
         ],
         temperature: 0.4,

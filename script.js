@@ -81,7 +81,8 @@ async function aifeature(id) {
     }
 
     try {
-        // Optional: simple loading state
+        //simple loading state
+        
         // (You can later improve by disabling the button etc.)
         const response = await fetch('/api/ai-note', {
             method: 'POST',
@@ -97,13 +98,14 @@ async function aifeature(id) {
 
         const data = await response.json();
 
-        const summary = data.summary || 'No summary.';
-        const tags = Array.isArray(data.tags) ? data.tags.join(', ') : '';
-        const mood = data.mood || 'unknown';
+        // 🔹 Store AI result on the note
+        note.aiSummary = data.summary || '';
+        note.aiTags = Array.isArray(data.tags) ? data.tags : [];
+        note.aiMood = data.mood || 'unknown';
 
-        alert(
-            `Summary:\n${summary}\n\nTags: ${tags}\nMood: ${mood}`
-        );
+        // 🔹 Save + re-render UI
+        saveToStorage();
+        displayNotes();
 
         // Later you can:
         // - Save summary/tags/mood into the note object
@@ -183,24 +185,43 @@ function displayNotes() {
         }
 
         return `
-            <div class="note-card">
-                <div class="note-header">
-                    <div>
-                        <div class="note-title">${displayTitle}</div>
-                        <span class="note-category category-${note.category}">${note.category}</span>
-                    </div>
-                </div>
-                <div class="note-content">${displayContent}</div>
-                <div class="note-meta">
-                    <span>📅 ${formattedDate}</span>
-                    <div class="note-actions">
-                        <button class="icon-btn edit-btn" onclick="aifeature(${note.id})">🤖</button>
-                        <button class="icon-btn edit-btn" onclick="editNote(${note.id})">✏️</button>
-                        <button class="icon-btn delete-btn" onclick="deleteNote(${note.id})">🗑️</button>
-                    </div>
-                </div>
+    <div class="note-card">
+        <div class="note-header">
+            <div>
+                <div class="note-title">${displayTitle}</div>
+                <span class="note-category category-${note.category}">${note.category}</span>
             </div>
-        `;
+        </div>
+
+        <div class="note-content">${displayContent}</div>
+
+        ${
+            note.aiSummary
+                ? `
+        <div class="ai-insights">
+            <div class="ai-title">🤖 AI Insights</div>
+            <p><strong>Summary:</strong> ${note.aiSummary}</p>
+            ${
+                note.aiTags && note.aiTags.length
+                    ? `<p><strong>Tags:</strong> ${note.aiTags.join(', ')}</p>`
+                    : ''
+            }
+            <p><strong>Mood:</strong> ${note.aiMood}</p>
+        </div>
+        `
+                : ''
+        }
+
+        <div class="note-meta">
+            <span>📅 ${formattedDate}</span>
+            <div class="note-actions">
+                <button class="icon-btn edit-btn" onclick="aifeature(${note.id})">🤖</button>
+                <button class="icon-btn edit-btn" onclick="editNote(${note.id})">✏️</button>
+                <button class="icon-btn delete-btn" onclick="deleteNote(${note.id})">🗑️</button>
+            </div>
+        </div>
+    </div>
+`;
     }).join('');
 }
 
